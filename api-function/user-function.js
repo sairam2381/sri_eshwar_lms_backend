@@ -45,6 +45,13 @@ exports.adminSignup = async (req, res) => {
       collegeName,
       password,
     } = req.body;
+    const checkCollege = await Admin.findOne({ collegeName });
+    if (checkCollege) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin already exists",
+      });
+    }
     const [checkDetails, checkUserDetails] = await Promise.all([
       Admin.findOne({ mobileNumber, email }),
       User.findOne({ mobileNumber, email }),
