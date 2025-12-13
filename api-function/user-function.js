@@ -121,6 +121,17 @@ exports.fetchAssignments = async (req, res) => {
 exports.submitTest = async (req, res) => {
   try {
     const { userId, assignmentId } = req.body;
+    const user = await User.findById(userId);
+    const isAssigned = user.setOfAssignmentsAssigned.some(
+      (id) => id.toString() === assignmentId
+    );
+
+    if (!isAssigned) {
+      return res.status(400).json({
+        success: false,
+        message: "you have already submitted the test",
+      });
+    }
     const completeAssignment = await assignmentCompleted.create({
       user: userId,
       assignment: assignmentId,
@@ -132,6 +143,9 @@ exports.submitTest = async (req, res) => {
       },
       { new: true }
     );
+    const updateUser = await User.findByIdAndUpdate(userId, {
+      $pull: { setOfAssignmentsAssigned: assignmentId },
+    });
     return res.status(200).json({
       success: true,
       message: "Test is submitted successfully",
