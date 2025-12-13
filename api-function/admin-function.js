@@ -87,3 +87,25 @@ exports.createAssignments = async (req, res) => {
     });
   }
 };
+
+exports.deactivateUser = async (req, res) => {
+  try {
+    const { userId, decision } = req.body;
+    const deactivateUser = await user.findByIdAndUpdate(
+      userId,
+      {
+        active: decision,
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "User is deactivated",
+    });
+  } catch (e) {
+    return res.status(404).json({
+      success: false,
+      error: e,
+    });
+  }
+};
