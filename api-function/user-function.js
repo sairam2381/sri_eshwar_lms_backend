@@ -1,5 +1,7 @@
 const Admin = require("../models/admin");
 const User = require("../models/user");
+const assignmentCompleted = require("../models/assignment-completed");
+const assignmentCreated = require("../models/assignment-created");
 exports.createUser = async (req, res) => {
   try {
     const {
@@ -115,3 +117,29 @@ exports.fetchAssignments = async (req, res) => {
 
 //   }
 // }
+
+exports.submitTest = async (req, res) => {
+  try {
+    const { userId, assignmentId } = req.body;
+    const completeAssignment = await assignmentCompleted.create({
+      user: userId,
+      assignment: assignmentId,
+    });
+    const updateAssignment = await assignmentCreated.findByIdAndUpdate(
+      assignmentId,
+      {
+        $push: { assignmentCompleted: completeAssignment._id },
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Test is submitted successfully",
+    });
+  } catch (e) {
+    return res.status(404).json({
+      success: false,
+      error: e,
+    });
+  }
+};

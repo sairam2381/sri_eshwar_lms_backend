@@ -1,6 +1,8 @@
 const admin = require("../models/admin");
 const user = require("../models/user");
 const Assignment = require("../models/assignment-created");
+const AssignmentCompleted = require("../models/assignment-completed");
+const assignmentCreated = require("../models/assignment-created");
 exports.getAllRequests = async (req, res) => {
   try {
     // const { id } = req.params;
@@ -109,3 +111,4 @@ exports.deactivateUser = async (req, res) => {
     });
   }
 };
+
