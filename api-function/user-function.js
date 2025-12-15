@@ -3,6 +3,7 @@ const User = require("../models/user");
 const assignmentCompleted = require("../models/assignment-completed");
 const assignmentCreated = require("../models/assignment-created");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 exports.createUser = async (req, res) => {
   try {
     const {
@@ -157,7 +158,7 @@ exports.submitTest = async (req, res) => {
 exports.userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const checkUser = await User.findOne(email);
+    const checkUser = await User.findOne({ email: email });
     if (!checkUser) {
       return res.status(400).json({
         success: false,
@@ -177,7 +178,26 @@ exports.userLogin = async (req, res) => {
         message: "Password is not correct",
       });
     }
+    const token = jwt.sign(
+      {
+        email: checkUser.email,
+        id: checkUser._id,
+        accountType: "User",
+        collegeName: checkUser.collegeName,
+      },
+      process.env.JWT,
+      { expiresIn: "24h" }
+    );
+    checkUser.password = undefined;
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      token,
+      userDetails: checkUser,
+    });
   } catch (e) {
+    console.log("The error:", e);
+
     res.status(404).json({
       success: false,
       error: e,
