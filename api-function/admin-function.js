@@ -7,8 +7,9 @@ const assignmentCompleted = require("../models/assignment-completed");
 exports.getAllRequests = async (req, res) => {
   try {
     // const { id } = req.params;
-    const { id } = req.query;
-    console.log("Get all requests:", id);
+    // const { id } = req.query;
+    const id = req.user.id;
+    // console.log("Get all requests:", id);
     const getDetails = await admin.findById(id).populate("listOfRequest");
     return res.status(200).json({
       success: true,
@@ -23,7 +24,8 @@ exports.getAllRequests = async (req, res) => {
 };
 exports.acceptOrDecline = async (req, res) => {
   try {
-    const { adminId, userId, select } = req.body;
+    const adminId = req.user.id;
+    const { userId, select } = req.body;
     if (select === 1) {
       await user.findByIdAndUpdate(userId, { active: true }, { new: true });
     }
@@ -48,7 +50,8 @@ exports.acceptOrDecline = async (req, res) => {
 
 exports.createAssignments = async (req, res) => {
   try {
-    const { assignmentName, deadLine, adminId } = req.body;
+    const adminId = req.user.id;
+    const { assignmentName, deadLine } = req.body;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -93,6 +96,7 @@ exports.createAssignments = async (req, res) => {
 
 exports.deactivateUser = async (req, res) => {
   try {
+    const adminId = req.user.id;
     const { userId, decision } = req.body;
     const deactivateUser = await user.findByIdAndUpdate(
       userId,
