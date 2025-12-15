@@ -5,10 +5,8 @@ services:
     build: .
     container_name: resume-backend
     restart: always
-    env_file:
-      - .env
     ports:
-      - "9001:9001"
+      - "8080:21000" # External:Internal port mapping
 
     deploy:
       resources:
